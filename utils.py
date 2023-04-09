@@ -14,6 +14,11 @@ class ExtendedEnum(Enum):
         return list(map(lambda c: c.name, cls))
 
 
+class LivingBeingStateEnum(ExtendedEnum):
+    ALIVE = 'alive'
+    DEAD = 'dead'
+
+
 class genderEnum(ExtendedEnum):
     MALE = 'male'
     FEMALE = 'female'
@@ -28,13 +33,18 @@ class AnimalSpecieEnum(ExtendedEnum):
     GIRAFFE = 'giraffe'
 
 
+class DietEnum(ExtendedEnum):
+    CARNIVOROUS = 'carnivorous'
+    HERBIVOROUS = 'herbivorous'
+
+
 class AnimalSpecieDietEnum(ExtendedEnum):
-    LION = 'carnivorous'
-    TIGER = 'carnivorous'
-    COYOTE = 'carnivorous'
-    ELEPHANT = 'herbivorous'
-    ANTELOPE = 'herbivorous'
-    GIRAFFE = 'herbivorous'
+    LION = DietEnum.CARNIVOROUS.value
+    TIGER = DietEnum.CARNIVOROUS.value
+    COYOTE = DietEnum.CARNIVOROUS.value
+    ELEPHANT = DietEnum.HERBIVOROUS.value
+    ANTELOPE = DietEnum.HERBIVOROUS.value
+    GIRAFFE = DietEnum.HERBIVOROUS.value
 
 
 class PlantspecieEnum(ExtendedEnum):

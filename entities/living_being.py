@@ -4,18 +4,41 @@ in an enclosure (animals and plants) and their initialization.
 """
 
 
+from typing import Union
 from utils import (
     AnimalSpecieDietEnum,
     PlantspecieEnum,
     genderEnum,
-    AnimalSpecieEnum
+    AnimalSpecieEnum,
+    LivingBeingStateEnum,
+    DietEnum
 )
 
 
 class LivingBeing():
     """
     Common base entity class for animals and plant.
+
+    Properties
+    ----------
+    state: str
+        The living being state (alive or dead)
     """
+
+    def __init__(self) -> None:
+        """
+        Initialize the living being object.
+
+        Returns
+        -------
+        None
+        """
+        # A new living being has to be alive..
+        self._state = LivingBeingStateEnum.ALIVE.value
+
+    @property
+    def state(self) -> str:
+        return self._state
 
 
 class Animal(LivingBeing):
@@ -42,6 +65,8 @@ class Animal(LivingBeing):
         -------
         None
         """
+        # Initialize the parent LivingBeing object
+        super(Animal, self).__init__()
 
         # Validate name value
         if name is None or not isinstance(name, str):
@@ -63,7 +88,7 @@ class Animal(LivingBeing):
         specie_key = AnimalSpecieEnum.names_list()[
             AnimalSpecieEnum.values_list().index(specie) + 1
         ]
-        self._diet = AnimalSpecieDietEnum[specie_key]
+        self._diet = AnimalSpecieDietEnum[specie_key].value
 
         self._gender = gender
         self._specie = specie
@@ -87,6 +112,39 @@ class Animal(LivingBeing):
     def specie(self) -> str:
         return self._specie
 
+    def eat(self, food: LivingBeing) -> None:
+        """
+        Feed the animal instance.
+
+        Parameters
+        ----------
+            food: Animal | Plant
+
+        Returns
+        -------
+        None
+        """
+        if not food:
+            raise ValueError(
+                "`food` parameter value received is not correct."
+            )
+        if (
+            self.diet == DietEnum.CARNIVOROUS.value
+            and not isinstance(food, Animal)
+        ):
+            raise ValueError(
+                f"{self.specie} should be fed with an Animal object."
+            )
+        elif (
+            self.diet == DietEnum.HERBIVOROUS.value
+            and not isinstance(food, Plant)
+        ):
+            raise ValueError(
+                f"{self.specie} should be fed with a Plant object."
+            )
+
+        # Feeding the animal
+
 
 class Plant(LivingBeing):
     """
@@ -105,6 +163,8 @@ class Plant(LivingBeing):
         -------
         None
         """
+        # Initialize the parent LivingBeing object
+        super(Plant, self).__init__()
 
         # Validate specie value
         if specie is None or not isinstance(specie, str) \
