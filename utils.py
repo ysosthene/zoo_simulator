@@ -10,10 +10,37 @@ class ExtendedEnum(Enum):
         return list(map(lambda c: c.value, cls))
 
     @classmethod
-    def keys_list(cls):
-        return list(map(lambda c: c.key, cls))
+    def names_list(cls):
+        return list(map(lambda c: c.name, cls))
 
 
 class genderEnum(ExtendedEnum):
     MALE = 'male'
     FEMALE = 'female'
+
+
+class AnimalSpecieEnum(ExtendedEnum):
+    LION = 'lion'
+    TIGER = 'tiger'
+    COYOTE = 'coyote'
+    ELEPHANT = 'elephant'
+    ANTELOPE = 'antelope'
+    GIRAFFE = 'giraffe'
+
+
+class AnimalSpecieDietEnum(ExtendedEnum):
+    LION = 'carnivorous'
+    TIGER = 'carnivorous'
+    COYOTE = 'carnivorous'
+    ELEPHANT = 'herbivorous'
+    ANTELOPE = 'herbivorous'
+    GIRAFFE = 'herbivorous'
+
+
+class PlantspecieEnum(ExtendedEnum):
+    SEAWEED = "seaweed"
+
+
+class SpecieTypeEnum(ExtendedEnum):
+    ANIMAL = 'animal'
+    PLANT = 'plant'

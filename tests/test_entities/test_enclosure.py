@@ -1,6 +1,7 @@
 
 from entities.enclosure import Enclosure
 from entities.living_being import Animal, Plant
+from utils import AnimalSpecieEnum, PlantspecieEnum, genderEnum
 
 
 def test_enclosure_entity():
@@ -9,10 +10,22 @@ def test_enclosure_entity():
     assert len(enclosure.get_animals()) == 0
     assert len(enclosure.get_plants()) == 0
 
-    animal_1 = Animal(name="Panther", gender='male')
-    animal_2 = Animal(name="Panther", gender='female')
-    animal_3 = Animal(name="Lion", gender='female')
-    plant_1 = Plant(name="Tulip")
+    animal_1 = Animal(
+        name="Black",
+        specie=AnimalSpecieEnum.LION.value,
+        gender=genderEnum.MALE.value
+    )
+    animal_2 = Animal(
+        name="Brown",
+        specie=AnimalSpecieEnum.TIGER.value,
+        gender=genderEnum.FEMALE.value
+    )
+    animal_3 = Animal(
+        name="Jimmy",
+        specie=AnimalSpecieEnum.TIGER.value,
+        gender=genderEnum.MALE.value
+    )
+    plant_1 = Plant(specie=PlantspecieEnum.SEAWEED.value)
 
     enclosure.add_animal(animal=animal_1)
     enclosure.add_animal(animal=animal_2)

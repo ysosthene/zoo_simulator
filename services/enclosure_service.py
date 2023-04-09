@@ -26,7 +26,7 @@ def report_enclosure_state(enclosure: Enclosure) -> str:
     """
     # Group animals by name and gender
     animal_groups = groupby(
-        enclosure.get_animals(), lambda animal: (animal.name, animal.gender)
+        enclosure.get_animals(), lambda animal: (animal.specie, animal.gender)
     )
     # (Lion, male)
     for agg, group in animal_groups:
