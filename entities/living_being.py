@@ -4,7 +4,6 @@ in an enclosure (animals and plants) and their initialization.
 """
 
 
-from typing import Union
 from utils import (
     AnimalSpecieDietEnum,
     PlantspecieEnum,
@@ -39,6 +38,26 @@ class LivingBeing():
     @property
     def state(self) -> str:
         return self._state
+
+    def set_state(self, state: str) -> None:
+        """
+        Sets the state value of the living being object.
+
+        Parameters
+        ----------
+            state: str
+
+        Returns
+        -------
+        None
+        """
+        # Validate state value
+        if state is None or state not in LivingBeingStateEnum.values_list():
+            raise ValueError(
+                f"`state` should be a among the following values \
+                    {LivingBeingStateEnum.values_list()}.")
+
+        self._state = state
 
 
 class Animal(LivingBeing):
@@ -86,7 +105,7 @@ class Animal(LivingBeing):
 
         # Fetch the matching diet value using the key in AnimalSpecieEnum
         specie_key = AnimalSpecieEnum.names_list()[
-            AnimalSpecieEnum.values_list().index(specie) + 1
+            AnimalSpecieEnum.values_list().index(specie)
         ]
         self._diet = AnimalSpecieDietEnum[specie_key].value
 

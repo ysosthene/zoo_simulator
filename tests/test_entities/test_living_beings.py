@@ -1,13 +1,26 @@
 
 
 import pytest
-from entities.living_being import Animal, Plant
-from utils import AnimalSpecieEnum
+from entities.living_being import Animal, LivingBeing, Plant
+from utils import AnimalSpecieEnum, LivingBeingStateEnum
 
 
 def test_living_being_entity():
-    # Nothing for now
-    pass
+    # Test name attribute validation
+    entity = LivingBeing()
+    assert entity.state == LivingBeingStateEnum.ALIVE.value
+
+    with pytest.raises(TypeError):
+        entity.set_state()
+
+    with pytest.raises(ValueError):
+        entity.set_state(state=None)
+
+    with pytest.raises(ValueError):
+        entity.set_state(state="HALF_DEAD")
+
+    entity.set_state(state=LivingBeingStateEnum.DEAD.value)
+    assert entity.state == LivingBeingStateEnum.DEAD.value
 
 
 def test_animal_entity():

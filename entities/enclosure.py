@@ -50,6 +50,50 @@ class Enclosure():
 
         self._animals.append(animal)
 
+    def set_animals(self, animals: List[Animal]) -> None:
+        """
+        Set the complete list of animals
+
+        Parameters
+        ----------
+            animals: List[Animal]
+
+        Returns
+        -------
+        None
+        """
+        # Validate parameter value
+        if animals is None or any(
+            not isinstance(animal, Animal) for animal in animals
+        ):
+            raise ValueError(
+                "`animals` should be a list of valid instances of Animal."
+            )
+
+        self._animals = animals
+
+    def set_plants(self, plants: List[Plant]) -> None:
+        """
+        Set the complete list of plants
+
+        Parameters
+        ----------
+            plants: List[Plant]
+
+        Returns
+        -------
+        None
+        """
+        # Validate parameter value
+        if plants is None or any(
+            not isinstance(plant, Plant) for plant in plants
+        ):
+            raise ValueError(
+                "`plants` should be a list of valid instances of Plant."
+            )
+
+        self._plants = plants
+
     def add_plant(self, plant: Plant) -> None:
         """
         Add a new plant to the enclosure.

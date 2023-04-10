@@ -4,15 +4,20 @@ It defines user interaction with the zoo simulator
 """
 
 import os
-from typing import List, Tuple
 
 from entities.enclosure import Enclosure
 from entities.living_being import Animal, Plant
 from services.enclosure_service import (
     move_forward_in_time,
     report_enclosure_state
-    )
-from utils import AnimalSpecieDietEnum, AnimalSpecieEnum, PlantspecieEnum, SpecieTypeEnum, genderEnum
+)
+from utils import (
+    AnimalSpecieDietEnum,
+    AnimalSpecieEnum,
+    PlantspecieEnum,
+    SpecieTypeEnum,
+    genderEnum
+)
 
 
 def clear_console():
@@ -55,10 +60,8 @@ def get_gender_menu() -> str:
 
 
 def get_animal_gender_input() -> str:
-    while (
-        _input := input(get_gender_menu())
-    ):
-
+    while True:
+        _input = input(get_gender_menu())
         if _input in [
             "{:01d}".format(x)
             for x in range(1, len(genderEnum.values_list())+1)
@@ -74,10 +77,8 @@ def get_animal_gender_input() -> str:
 
 
 def get_animal_speecie_input() -> str:
-    while (
-        _input := input(get_specie_choice_menu(SpecieTypeEnum.ANIMAL.value))
-    ):
-
+    while True:
+        _input = input(get_specie_choice_menu(SpecieTypeEnum.ANIMAL.value))
         if _input in [
             "{:01d}".format(x)
             for x in range(1, len(AnimalSpecieEnum.values_list())+1)
@@ -92,9 +93,8 @@ def get_animal_speecie_input() -> str:
 
 
 def get_animal_name_input(prompt="Enter your animal's name: ") -> str:
-    while (
-        name_input := input(prompt)
-    ):
+    while True:
+        name_input = input(prompt)
         if name_input:
             clear_console()
             name = name_input
@@ -190,12 +190,12 @@ def trigger_moving_forward_in_time(enclosure: Enclosure) -> Enclosure:
 
     print(
         """
-        It is now another day as the sun has setted and is now raised.
-        Let's see how is going on there 👀!
+
+        The sun has setted now and life still goes on in our zoo.
+        Let's see what is going on there 👀!
 
         """
     )
-    ask_to_continue()
     return move_forward_in_time(enclosure=enclosure)
 
 
@@ -244,6 +244,7 @@ def main(enclosure: Enclosure = None, first_launch=True) -> None:
             current_enclosure = trigger_moving_forward_in_time(
                 enclosure=current_enclosure
             )
+            ask_to_continue()
         else:
             print("Invalid option, please try again!\n")
 
