@@ -8,7 +8,7 @@ import os
 from entities.enclosure import Enclosure
 from entities.living_being import Animal, Plant
 from services.enclosure_service import (
-    move_forward_in_time,
+    move_forward_to_next_day,
     report_enclosure_state
 )
 from utils import (
@@ -196,7 +196,7 @@ def trigger_moving_forward_in_time(enclosure: Enclosure) -> Enclosure:
 
         """
     )
-    return move_forward_in_time(enclosure=enclosure)
+    return move_forward_to_next_day(enclosure=enclosure)
 
 
 def get_menu(enclosure: Enclosure) -> str:

@@ -34,10 +34,15 @@ class LivingBeing():
         """
         # A new living being has to be alive..
         self._state = LivingBeingStateEnum.ALIVE.value
+        self._life_points = 10
 
     @property
     def state(self) -> str:
         return self._state
+
+    @property
+    def life_points(self) -> str:
+        return self._life_points
 
     def set_state(self, state: str) -> None:
         """
@@ -58,6 +63,25 @@ class LivingBeing():
                     {LivingBeingStateEnum.values_list()}.")
 
         self._state = state
+
+    def set_life_points(self, life_points: int) -> None:
+        """
+        Sets the life_points value of the living being object.
+
+        Parameters
+        ----------
+            life_points: str
+
+        Returns
+        -------
+        None
+        """
+        # Validate life_points value
+        if life_points is None or not isinstance(life_points, int) \
+                or life_points < 0:
+            raise ValueError("`life_points` should be a an integer value")
+
+        self._life_points = life_points
 
 
 class Animal(LivingBeing):
