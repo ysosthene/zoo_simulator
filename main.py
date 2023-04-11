@@ -11,7 +11,10 @@ from repositories.enclosure_repository import (
     load_enclosure_data_from_file,
     save_enclosure_data_to_file,
 )
-from services.enclosure_service import move_forward_to_next_day, report_enclosure_state
+from services.enclosure_service import (
+    move_forward_to_next_day,
+    report_enclosure_state
+)
 from utils import (
     CONFIG_FILENAME,
     AnimalSpecieEnum,
@@ -37,7 +40,9 @@ def get_specie_choice_menu(type: str) -> str:
     elif type == SpecieTypeEnum.PLANT.value:
         specie_list = PlantspecieEnum.values_list()
     else:
-        raise ValueError(f"`type` value should be among {SpecieTypeEnum.values_list()}")
+        raise ValueError(
+            f"`type` value should be among {SpecieTypeEnum.values_list()}"
+        )
 
     for idx, specie in enumerate(specie_list):
         menu += f"""
@@ -62,7 +67,8 @@ def get_animal_gender_input() -> str:
     while True:
         _input = input(get_gender_menu())
         if _input in [
-            "{:01d}".format(x) for x in range(1, len(genderEnum.values_list()) + 1)
+            "{:01d}".format(x) for x in
+                range(1, len(genderEnum.values_list()) + 1)
         ]:
             gender = genderEnum.values_list()[int(_input) - 1]
             clear_console()
@@ -246,9 +252,9 @@ def main(enclosure: Enclosure = None, first_launch=True) -> None:
 
     while (user_input := input(get_menu(current_enclosure))) != "6":
         if user_input == "1":
-            current_enclosure = trigger_adding_an_animal(enclosure=current_enclosure)
+            current_enclosure = trigger_adding_an_animal(current_enclosure)
         elif user_input == "2":
-            current_enclosure = trigger_adding_a_seaweed(enclosure=current_enclosure)
+            current_enclosure = trigger_adding_a_seaweed(current_enclosure)
         elif user_input == "3":
             current_enclosure = trigger_moving_forward_in_time(
                 enclosure=current_enclosure

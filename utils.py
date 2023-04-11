@@ -17,7 +17,7 @@ def log_to_file(content: str):
     with open(path, mode=mode) as file:
         file.write(
             f"""
---------------------------------------- {datetime.datetime.now()} ---------------------------------------
+------------- {datetime.datetime.now()} -------------
 {content}
 """
         )

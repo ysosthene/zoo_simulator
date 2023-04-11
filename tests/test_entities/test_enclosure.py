@@ -10,7 +10,9 @@ def test_enclosure_entity():
     assert len(enclosure.get_plants()) == 0
 
     animal_1 = Animal(
-        name="Black", specie=AnimalSpecieEnum.LION.value, gender=genderEnum.MALE.value
+        name="Black",
+        specie=AnimalSpecieEnum.LION.value,
+        gender=genderEnum.MALE.value
     )
     animal_2 = Animal(
         name="Brown",
@@ -18,7 +20,9 @@ def test_enclosure_entity():
         gender=genderEnum.FEMALE.value,
     )
     animal_3 = Animal(
-        name="Jimmy", specie=AnimalSpecieEnum.TIGER.value, gender=genderEnum.MALE.value
+        name="Jimmy",
+        specie=AnimalSpecieEnum.TIGER.value,
+        gender=genderEnum.MALE.value
     )
     plant_1 = Plant(specie=PlantspecieEnum.SEAWEED.value)
 

@@ -63,9 +63,11 @@ class Enclosure:
         None
         """
         # Validate parameter value
-        if animals is None or any(not isinstance(animal, Animal) for animal in animals):
-            raise ValueError("`animals` should be a list of valid instances of Animal.")
-
+        if animals is None or \
+                any(not isinstance(animal, Animal) for animal in animals):
+            raise ValueError(
+                "`animals` should be a list of valid instances of Animal."
+            )
         self._animals = animals
 
     def set_plants(self, plants: List[Plant]) -> None:
@@ -81,8 +83,11 @@ class Enclosure:
         None
         """
         # Validate parameter value
-        if plants is None or any(not isinstance(plant, Plant) for plant in plants):
-            raise ValueError("`plants` should be a list of valid instances of Plant.")
+        if plants is None or \
+                any(not isinstance(plant, Plant) for plant in plants):
+            raise ValueError(
+                "`plants` should be a list of valid instances of Plant."
+            )
 
         self._plants = plants
 

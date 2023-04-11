@@ -35,7 +35,9 @@ def save_enclosure_data_to_file(enclosure: Enclosure) -> None:
         yaml.dump(data, f, sort_keys=False)
 
 
-def load_enclosure_data_from_file(enclosure: Enclosure, path: str) -> Enclosure:
+def load_enclosure_data_from_file(
+        enclosure: Enclosure, path: str
+) -> Enclosure:
     """
     Saves the given zoo content to a yaml file.
 

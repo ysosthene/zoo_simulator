@@ -11,7 +11,12 @@ from services.enclosure_service import (
     make_living_beings_spend_some_time,
     remove_dead_living_entities_from_enclosure,
 )
-from utils import AnimalSpecieEnum, LivingBeingStateEnum, PlantspecieEnum, genderEnum
+from utils import (
+    AnimalSpecieEnum,
+    LivingBeingStateEnum,
+    PlantspecieEnum,
+    genderEnum
+)
 
 
 def test_get_first_living_plant_index_in_list():
@@ -27,16 +32,22 @@ def test_get_first_living_plant_index_in_list():
     assert get_first_living_plant_index_in_list(plants=plants) is not None
 
     enclosure.set_plants([seaweed_2])
-    assert get_first_living_plant_index_in_list(plants=enclosure.get_plants()) == 0
+    assert get_first_living_plant_index_in_list(
+        plants=enclosure.get_plants()
+    ) == 0
 
     enclosure.set_plants([seaweed_1])
-    assert get_first_living_plant_index_in_list(plants=enclosure.get_plants()) is None
+    assert get_first_living_plant_index_in_list(
+        plants=enclosure.get_plants()
+    ) is None
 
 
 def test_remove_dead_living_entities_from_enclosure():
     enclosure = Enclosure()
     lion = Animal(
-        name="Simba", specie=AnimalSpecieEnum.LION.value, gender=genderEnum.MALE.value
+        name="Simba",
+        specie=AnimalSpecieEnum.LION.value,
+        gender=genderEnum.MALE.value
     )
     giraffe = Animal(
         name="Jimmy",
@@ -56,7 +67,9 @@ def test_remove_dead_living_entities_from_enclosure():
 def test_let_animals_eat():
     enclosure = Enclosure()
     lion = Animal(
-        name="Simba", specie=AnimalSpecieEnum.LION.value, gender=genderEnum.MALE.value
+        name="Simba",
+        specie=AnimalSpecieEnum.LION.value,
+        gender=genderEnum.MALE.value
     )
     giraffe = Animal(
         name="Jimmy",
@@ -90,10 +103,14 @@ def test_let_animals_eat():
 def test_make_living_beings_spend_some_time():
     enclosure = Enclosure()
     lion = Animal(
-        name="Simba", specie=AnimalSpecieEnum.LION.value, gender=genderEnum.MALE.value
+        name="Simba",
+        specie=AnimalSpecieEnum.LION.value,
+        gender=genderEnum.MALE.value
     )
     tiger_lilly = Animal(
-        name="Lilly", specie=AnimalSpecieEnum.LION.value, gender=genderEnum.FEMALE.value
+        name="Lilly",
+        specie=AnimalSpecieEnum.LION.value,
+        gender=genderEnum.FEMALE.value
     )
     tiger_lilly.set_age(20)
     seaweed = Plant(specie=PlantspecieEnum.SEAWEED.value)
