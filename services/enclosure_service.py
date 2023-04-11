@@ -16,26 +16,41 @@ def report_enclosure_state(enclosure: Enclosure) -> str:
             "`enclosure` should be a valid instance of Enclosure."
         )
 
+    # Group plants by specie
+    plant_group = [
+        list(result) for key, result in groupby(
+            enclosure.get_plants(), key=lambda plant: plant.specie
+            )
+    ]
     report = f"""
-        You could find for now {len(enclosure.get_plants())} plants
+    You currently have {len(enclosure.get_plants())} plant(s)""" + \
+        f""" from {len(plant_group)} specie(s):
     """
-    if not enclosure.get_animals():
-        report += """
-        There is no animal at this stage.
-        """
-        return report
 
-    report += f"""
-        There is also the following {len(enclosure.get_animals())} animals:
-    """
-    # Group animals by name and gender
-    animal_groups = groupby(
-        enclosure.get_animals(), lambda animal: (animal.specie, animal.gender)
-    )
-    # (Lion, male)
-    for agg, group in animal_groups:
+    for group in plant_group:
         report += f"""
-            - {agg[1]} {agg[0]} : {len(list(group))}"""
+        - {group[0].specie}: """
+        for idx, plant in enumerate(list(group)):
+            report += f"""
+            * #{idx+1}: {plant.life_points} LPs left"""
+
+    # Group animals by specie
+    animal_groups = [
+        list(result) for key, result in groupby(
+            enclosure.get_animals(), key=lambda animal: animal.specie
+            )
+    ]
+    report += f"""
+
+    You also have {len(animal_groups)} animals specie(s):
+    """
+    for group in animal_groups:
+        report += f"""
+        - {group[0].specie}:"""
+        for animal in list(group):
+            report += f"""
+            * A {animal.gender} named `{animal.name}` with """ + \
+                f"""{animal.life_points} LPs left"""
 
     return report
 
