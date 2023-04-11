@@ -6,7 +6,7 @@ You add as many as you want and watch them eatn born, grow old and even dies. Ta
 ## Configuration
 
 Create a virtual env and activate it
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+Use the package manager to install required dependencies
 
 ```bash
 python3 -m venv venv
