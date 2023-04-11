@@ -6,7 +6,7 @@ from typing import List
 from entities.living_being import Animal, Plant
 
 
-class Enclosure():
+class Enclosure:
     """
     Base class defining Enclosure attributes.
 
@@ -25,11 +25,11 @@ class Enclosure():
         self._plants = []
 
     def get_plants(self) -> List[Plant]:
-        """ Retrieve list of enclosure's plants"""
+        """Retrieve list of enclosure's plants"""
         return self._plants
 
     def get_animals(self) -> List[Animal]:
-        """ Retrieve list of enclosure's animals"""
+        """Retrieve list of enclosure's animals"""
         return self._animals
 
     def add_animal(self, animal: Animal) -> None:
@@ -63,13 +63,11 @@ class Enclosure():
         None
         """
         # Validate parameter value
-        if animals is None or any(
-            not isinstance(animal, Animal) for animal in animals
-        ):
+        if animals is None or \
+                any(not isinstance(animal, Animal) for animal in animals):
             raise ValueError(
                 "`animals` should be a list of valid instances of Animal."
             )
-
         self._animals = animals
 
     def set_plants(self, plants: List[Plant]) -> None:
@@ -85,9 +83,8 @@ class Enclosure():
         None
         """
         # Validate parameter value
-        if plants is None or any(
-            not isinstance(plant, Plant) for plant in plants
-        ):
+        if plants is None or \
+                any(not isinstance(plant, Plant) for plant in plants):
             raise ValueError(
                 "`plants` should be a list of valid instances of Plant."
             )

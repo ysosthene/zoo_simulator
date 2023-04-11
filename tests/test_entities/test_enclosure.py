@@ -1,4 +1,3 @@
-
 from entities.enclosure import Enclosure
 from entities.living_being import Animal, Plant
 from utils import AnimalSpecieEnum, PlantspecieEnum, genderEnum
@@ -18,7 +17,7 @@ def test_enclosure_entity():
     animal_2 = Animal(
         name="Brown",
         specie=AnimalSpecieEnum.TIGER.value,
-        gender=genderEnum.FEMALE.value
+        gender=genderEnum.FEMALE.value,
     )
     animal_3 = Animal(
         name="Jimmy",

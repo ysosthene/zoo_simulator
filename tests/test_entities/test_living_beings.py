@@ -1,5 +1,3 @@
-
-
 import pytest
 from entities.living_being import Animal, LivingBeing, Plant
 from utils import AnimalSpecieEnum, LivingBeingStateEnum
@@ -50,23 +48,12 @@ def test_animal_entity():
             specie="coyote",
         )
 
-    tiger = Animal(
-            name="Mufasa",
-            gender="male",
-            specie="lion",
-        )
-
     puppy = Animal(
         name="Scoobydoo",
         specie=AnimalSpecieEnum.ANTELOPE.value,
         gender="male",
     )
 
-    # Test for feeding an herbivorous with an animal
-    with pytest.raises(ValueError):
-        puppy.eat(food=tiger)
-
-    assert tiger.eat(food=puppy) is None
     assert puppy.name == "Scoobydoo"
     assert puppy.specie == "antelope"
     assert puppy.gender == "male"

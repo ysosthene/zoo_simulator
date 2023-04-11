@@ -7,47 +7,49 @@ import random
 from typing import List
 from entities.enclosure import Enclosure
 from entities.living_being import Animal, Plant
-from utils import DietEnum, LivingBeingStateEnum, genderEnum
+from utils import DietEnum, LivingBeingStateEnum, genderEnum, log_to_file
 
 
 def report_enclosure_state(enclosure: Enclosure) -> str:
     if enclosure is None or not (isinstance(enclosure, Enclosure)):
-        raise ValueError(
-            "`enclosure` should be a valid instance of Enclosure."
-        )
+        raise ValueError("`enclosure` should be an instance of Enclosure.")
 
     # Group plants by specie
     sorted_plants = sorted(
-        enclosure.get_plants(),
-        key=lambda plant: plant.specie
+        enclosure.get_plants(), key=lambda plant: plant.specie
     )
     plant_group = [
-        list(result) for key, result in groupby(
+        list(result)
+        for key, result in groupby(
             sorted_plants, key=lambda plant: plant.specie
-            )
+        )
     ]
-    report = f"""
-    You currently have {len(enclosure.get_plants())} plant(s)""" + \
-        f""" from {len(plant_group)} specie(s):
+    report = (
+        f"""
+    You currently have {len(enclosure.get_plants())} plant(s)"""
+        + f""" from {len(plant_group)} specie(s):
     """
+    )
 
     for group in plant_group:
         report += f"""
         - {group[0].specie.capitalize()}: """
         for idx, plant in enumerate(list(group)):
-            report += f"""
-            #{idx+1}: is {plant.age} days old and """ + \
-                f"""{plant.life_points} LPs left"""
+            report += (
+                f"""
+            #{idx+1}: is {plant.age} days old and """
+                + f"""{plant.life_points} LPs left"""
+            )
 
     # Group animals by specie
     sorted_animals = sorted(
-        enclosure.get_animals(),
-        key=lambda animal: animal.specie
+        enclosure.get_animals(), key=lambda animal: animal.specie
     )
     animal_groups = [
-        list(result) for key, result in groupby(
+        list(result)
+        for key, result in groupby(
             sorted_animals, key=lambda animal: animal.specie
-            )
+        )
     ]
     report += f"""
 
@@ -57,16 +59,20 @@ def report_enclosure_state(enclosure: Enclosure) -> str:
         report += f"""
         - {group[0].specie.capitalize()}:"""
         for animal in list(group):
-            report += f"""
-            * A {animal.age} days old {animal.gender} """ + \
-                f"""named `{animal.name}` with """ + \
-                f"""{animal.life_points} LPs left"""
+            report += (
+                f"""
+            * A {animal.age} days old {animal.gender} """
+                + f"""named `{animal.name}` with """
+                + f"""{animal.life_points} LPs left"""
+            )
+    # Log report
+    log_to_file(report)
 
     return report
 
 
 def get_first_living_plant_index_in_list(
-        plants: List[Plant],
+    plants: List[Plant],
 ) -> int:
     """
     Return the first living plant index in a giving list
@@ -88,8 +94,8 @@ def get_first_living_plant_index_in_list(
 
 
 def get_first_eatable_animal_index_in_list(
-        animals: List[Animal],
-        exclude_idx: int,
+    animals: List[Animal],
+    exclude_idx: int,
 ) -> int:
     """
     Return the first living animal index in a giving list
@@ -114,9 +120,11 @@ def get_first_eatable_animal_index_in_list(
 
     # Look for an different specie to eat
     for index, animal in enumerate(animals):
-        if exclude_idx != index \
-                and animal.state == LivingBeingStateEnum.ALIVE.value \
-                and animal.specie != animals[exclude_idx].specie:
+        if (
+            exclude_idx != index
+            and animal.state == LivingBeingStateEnum.ALIVE.value
+            and animal.specie != animals[exclude_idx].specie
+        ):
             return index
     return None
 
@@ -170,13 +178,12 @@ def let_animals_eat(enclosure: Enclosure) -> Enclosure:
             print(
                 f"{animal.name}, a {animal.specie} "
                 f"has {animal.life_points} LPs and is looking for food."
-                )
+            )
 
             # If its a canivorous, look for another animal to eat
             if animal.diet == DietEnum.CARNIVOROUS.value:
                 curr_animal_food_idx = get_first_eatable_animal_index_in_list(
-                    animals=animals,
-                    exclude_idx=current_animal_idx
+                    animals=animals, exclude_idx=current_animal_idx
                 )
                 if curr_animal_food_idx is not None:
                     print(
@@ -187,30 +194,26 @@ def let_animals_eat(enclosure: Enclosure) -> Enclosure:
 
                     # Found some animals to eat. Update LPs
                     # The eater gots 5 LP
-                    animals[
-                            current_animal_idx
-                            ].set_life_points(life_points=animal.life_points+5)
+                    animals[current_animal_idx].set_life_points(
+                        life_points=animal.life_points + 5
+                    )
 
                     # And the eaten looses 4LP
-                    food_lp = animals[
-                        curr_animal_food_idx
-                        ].life_points
+                    food_lp = animals[curr_animal_food_idx].life_points
                     # Less than 4LP left, the poor dies
                     if food_lp <= 4:
-                        animals[
-                            curr_animal_food_idx
-                            ].set_life_points(life_points=0)
-
-                        animals[
-                            curr_animal_food_idx
-                            ].set_state(state=LivingBeingStateEnum.DEAD.value)
-                        dead_animals_indexes.append(
-                            curr_animal_food_idx
+                        animals[curr_animal_food_idx].set_life_points(
+                            life_points=0
                         )
+
+                        animals[curr_animal_food_idx].set_state(
+                            state=LivingBeingStateEnum.DEAD.value
+                        )
+                        dead_animals_indexes.append(curr_animal_food_idx)
                     else:
-                        animals[
-                            curr_animal_food_idx
-                            ].set_life_points(life_points=food_lp-4)
+                        animals[curr_animal_food_idx].set_life_points(
+                            life_points=food_lp - 4
+                        )
 
                     # Add the current animal to the already_fed_list
                     already_fed_animals_indexes.append(current_animal_idx)
@@ -222,7 +225,6 @@ def let_animals_eat(enclosure: Enclosure) -> Enclosure:
                     plants=plants
                 )
                 if curr_animal_food_idx is not None:
-
                     print(
                         f"It eats some "
                         f"{plants[curr_animal_food_idx].specie} "
@@ -231,26 +233,26 @@ def let_animals_eat(enclosure: Enclosure) -> Enclosure:
 
                     # Found some plant to eat. Update LPs
                     # The eater gots 4 LP
-                    animals[
-                        current_animal_idx
-                        ].set_life_points(life_points=animal.life_points+4)
+                    animals[current_animal_idx].set_life_points(
+                        life_points=animal.life_points + 4
+                    )
 
                     # And the plant looses 2LP
                     plant_lp = plants[curr_animal_food_idx].life_points
 
                     # Less than 2LP left, the plant dies
                     if plant_lp <= 2:
-                        plants[
-                            curr_animal_food_idx
-                            ].set_life_points(life_points=0)
+                        plants[curr_animal_food_idx].set_life_points(
+                            life_points=0
+                        )
 
-                        plants[
-                            curr_animal_food_idx
-                            ].set_state(state=LivingBeingStateEnum.DEAD.value)
+                        plants[curr_animal_food_idx].set_state(
+                            state=LivingBeingStateEnum.DEAD.value
+                        )
                     else:
-                        plants[
-                            curr_animal_food_idx
-                            ].set_life_points(life_points=plant_lp-2)
+                        plants[curr_animal_food_idx].set_life_points(
+                            life_points=plant_lp - 2
+                        )
 
                     # Add the current animal to the already_fed_list
                     already_fed_animals_indexes.append(current_animal_idx)
@@ -258,19 +260,19 @@ def let_animals_eat(enclosure: Enclosure) -> Enclosure:
             break
 
         if curr_animal_food_idx is None and not skip:
-            # If no food found for the current animal, set it state to dead
+            # If no food found, set it state to dead
             print("It founds nothing to eat and dies...")
-            animals[
-                current_animal_idx
-            ].set_state(state=LivingBeingStateEnum.DEAD.value)
+            animals[current_animal_idx].set_state(
+                state=LivingBeingStateEnum.DEAD.value
+            )
             dead_animals_indexes.append(current_animal_idx)
 
     # update the enclosure
     enclosure.set_animals(animals)
     enclosure.set_plants(plants)
     print(
-        f"\n{len(dead_animals_indexes)} animal(s) died " +
-        "(hunger or had being eaten).\n\n"
+        f"\n{len(dead_animals_indexes)} animal(s) died "
+        + "(hunger or had being eaten).\n\n"
     )
 
     # Remose those dead entities
@@ -330,9 +332,7 @@ def make_living_beings_spend_some_time(enclosure: Enclosure) -> Enclosure:
     for idx, plant in enumerate(plants):
         plants[idx].set_life_points(plant.life_points + 1)
         if plant.age == 20:
-            print(
-                f"A {plant.specie} just died of old age."
-            )
+            print(f"A {plant.specie} just died of old age.")
             plants[idx].set_state(LivingBeingStateEnum.DEAD.value)
         else:
             plants[idx].set_age(plant.age + 1)
@@ -372,13 +372,13 @@ def make_living_beings_breed(enclosure: Enclosure) -> Enclosure:
 
     # Group animals by specie
     sorted_animals = sorted(
-        enclosure.get_animals(),
-        key=lambda animal: animal.specie
-    )
+            enclosure.get_animals(), key=lambda animal: animal.specie
+        )
     animal_groups = [
-        list(result) for key, result in groupby(
+        list(result)
+        for key, result in groupby(
             sorted_animals, key=lambda animal: animal.specie
-            )
+        )
     ]
     for group in animal_groups:
         # For each specie, group by gender
@@ -428,25 +428,17 @@ def make_living_beings_breed(enclosure: Enclosure) -> Enclosure:
     for idx, plant in enumerate(plants):
         if plant.life_points >= 10:
             # Create a new plant with half of this one LPs
-            new_baby_plant = Plant(
-                specie=plant.specie
-            )
-            new_baby_plant.set_life_points(int(plant.life_points/2))
+            new_baby_plant = Plant(specie=plant.specie)
+            new_baby_plant.set_life_points(int(plant.life_points / 2))
             new_baby_plant.set_age(plant.age)
             new_plants.append(new_baby_plant)
 
             # Update the parent and reduce its LPs by half
-            plants[idx].set_life_points(int(plant.life_points/2))
-    print(
-        f"\n{len(new_plants)} plant(s) reproduce to new ones !"
-    )
+            plants[idx].set_life_points(int(plant.life_points / 2))
+    print(f"\n{len(new_plants)} plant(s) reproduce to new ones !")
     # Set new content of the enclosure
-    enclosure.set_animals(
-        animals=enclosure.get_animals() + newborn_animals
-    )
-    enclosure.set_plants(
-        plants=plants + new_plants
-    )
+    enclosure.set_animals(animals=enclosure.get_animals() + newborn_animals)
+    enclosure.set_plants(plants=plants + new_plants)
     return enclosure
 
 

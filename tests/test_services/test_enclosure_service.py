@@ -9,7 +9,7 @@ from services.enclosure_service import (
     let_animals_eat,
     make_living_beings_breed,
     make_living_beings_spend_some_time,
-    remove_dead_living_entities_from_enclosure
+    remove_dead_living_entities_from_enclosure,
 )
 from utils import (
     AnimalSpecieEnum,
@@ -29,9 +29,7 @@ def test_get_first_living_plant_index_in_list():
     enclosure.add_plant(seaweed_2)
     plants = enclosure.get_plants()
 
-    assert get_first_living_plant_index_in_list(
-        plants=plants
-    ) is not None
+    assert get_first_living_plant_index_in_list(plants=plants) is not None
 
     enclosure.set_plants([seaweed_2])
     assert get_first_living_plant_index_in_list(
@@ -54,7 +52,7 @@ def test_remove_dead_living_entities_from_enclosure():
     giraffe = Animal(
         name="Jimmy",
         specie=AnimalSpecieEnum.GIRAFFE.value,
-        gender=genderEnum.MALE.value
+        gender=genderEnum.MALE.value,
     )
 
     lion.set_state(LivingBeingStateEnum.DEAD.value)
@@ -62,9 +60,7 @@ def test_remove_dead_living_entities_from_enclosure():
     enclosure.add_animal(giraffe)
 
     assert len(enclosure.get_animals()) == 2
-    enclosure = remove_dead_living_entities_from_enclosure(
-        enclosure=enclosure
-    )
+    enclosure = remove_dead_living_entities_from_enclosure(enclosure=enclosure)
     assert len(enclosure.get_animals()) == 1
 
 
@@ -78,7 +74,7 @@ def test_let_animals_eat():
     giraffe = Animal(
         name="Jimmy",
         specie=AnimalSpecieEnum.GIRAFFE.value,
-        gender=genderEnum.MALE.value
+        gender=genderEnum.MALE.value,
     )
     seaweed_1 = Plant(specie=PlantspecieEnum.SEAWEED.value)
 
@@ -139,46 +135,46 @@ def test_make_living_beings_breed() -> None:
         Animal(
             name="Simba",
             specie=AnimalSpecieEnum.LION.value,
-            gender=genderEnum.MALE.value
+            gender=genderEnum.MALE.value,
         )
     )
     enclosure.add_animal(
         Animal(
             name="Nala",
             specie=AnimalSpecieEnum.LION.value,
-            gender=genderEnum.FEMALE.value
+            gender=genderEnum.FEMALE.value,
         )
     )
     enclosure.add_animal(
         Animal(
             name="giraffe 1",
             specie=AnimalSpecieEnum.GIRAFFE.value,
-            gender=genderEnum.MALE.value
+            gender=genderEnum.MALE.value,
         )
     )
     enclosure.add_animal(
         Animal(
             name="giraffe 2",
             specie=AnimalSpecieEnum.LION.value,
-            gender=genderEnum.MALE.value
+            gender=genderEnum.MALE.value,
         )
     )
     enclosure.add_animal(
         Animal(
             name="giraffe 3",
             specie=AnimalSpecieEnum.GIRAFFE.value,
-            gender=genderEnum.FEMALE.value
+            gender=genderEnum.FEMALE.value,
         )
     )
     tiger_1 = Animal(
-            name="Flash",
-            specie=AnimalSpecieEnum.TIGER.value,
-            gender=genderEnum.FEMALE.value
+        name="Flash",
+        specie=AnimalSpecieEnum.TIGER.value,
+        gender=genderEnum.FEMALE.value,
     )
     tiger_2 = Animal(
-            name="Flash 2",
-            specie=AnimalSpecieEnum.TIGER.value,
-            gender=genderEnum.MALE.value
+        name="Flash 2",
+        specie=AnimalSpecieEnum.TIGER.value,
+        gender=genderEnum.MALE.value,
     )
     tiger_1.set_life_points(4)
     tiger_2.set_life_points(1)
