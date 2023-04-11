@@ -205,7 +205,6 @@ def get_menu(enclosure: Enclosure) -> str:
     return f"""
         {report_enclosure_state(enclosure=enclosure)}
 
-
         Please select one of the following options:
 
         1 -> Add an Animal.
