@@ -8,7 +8,6 @@ from services.enclosure_service import (
     get_first_living_plant_index_in_list,
     let_animals_eat,
     make_living_beings_spend_some_time,
-    move_forward_to_next_day,
     remove_dead_living_entities_from_enclosure
 )
 from utils import (
@@ -111,11 +110,23 @@ def test_make_living_beings_spend_some_time():
         specie=AnimalSpecieEnum.LION.value,
         gender=genderEnum.MALE.value
     )
+    tiger_lilly = Animal(
+        name="Lilly",
+        specie=AnimalSpecieEnum.LION.value,
+        gender=genderEnum.FEMALE.value
+    )
+    tiger_lilly.set_age(20)
     seaweed = Plant(specie=PlantspecieEnum.SEAWEED.value)
-
-    lion.set_state(LivingBeingStateEnum.DEAD.value)
     enclosure.add_animal(lion)
+    enclosure.add_animal(tiger_lilly)
     enclosure.add_plant(seaweed)
+
     enclosure = make_living_beings_spend_some_time(enclosure)
+    assert len(enclosure.get_animals()) == 2
+
+    # Check life_points updates
     assert enclosure.get_animals()[0].life_points == 9
     assert enclosure.get_plants()[0].life_points == 11
+
+    # Check that tiger_lily died because of age
+    assert enclosure.get_animals()[1].state == LivingBeingStateEnum.DEAD.value
