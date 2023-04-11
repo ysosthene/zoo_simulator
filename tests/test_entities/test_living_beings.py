@@ -9,6 +9,7 @@ def test_living_being_entity():
     # Test name attribute validation
     entity = LivingBeing()
     assert entity.state == LivingBeingStateEnum.ALIVE.value
+    assert entity.life_points == 10
 
     with pytest.raises(TypeError):
         entity.set_state()
@@ -18,6 +19,9 @@ def test_living_being_entity():
 
     with pytest.raises(ValueError):
         entity.set_state(state="HALF_DEAD")
+
+    with pytest.raises(ValueError):
+        entity.set_life_points(-1)
 
     entity.set_state(state=LivingBeingStateEnum.DEAD.value)
     assert entity.state == LivingBeingStateEnum.DEAD.value

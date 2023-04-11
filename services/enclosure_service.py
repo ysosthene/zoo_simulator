@@ -16,26 +16,41 @@ def report_enclosure_state(enclosure: Enclosure) -> str:
             "`enclosure` should be a valid instance of Enclosure."
         )
 
+    # Group plants by specie
+    plant_group = [
+        list(result) for key, result in groupby(
+            enclosure.get_plants(), key=lambda plant: plant.specie
+            )
+    ]
     report = f"""
-        You could find for now {len(enclosure.get_plants())} plants
+    You currently have {len(enclosure.get_plants())} plant(s)""" + \
+        f""" from {len(plant_group)} specie(s):
     """
-    if not enclosure.get_animals():
-        report += """
-        There is no animal at this stage.
-        """
-        return report
 
-    report += f"""
-        There is also the following {len(enclosure.get_animals())} animals:
-    """
-    # Group animals by name and gender
-    animal_groups = groupby(
-        enclosure.get_animals(), lambda animal: (animal.specie, animal.gender)
-    )
-    # (Lion, male)
-    for agg, group in animal_groups:
+    for group in plant_group:
         report += f"""
-            - {agg[1]} {agg[0]} : {len(list(group))}"""
+        - {group[0].specie}: """
+        for idx, plant in enumerate(list(group)):
+            report += f"""
+            * #{idx+1}: {plant.life_points} LPs left"""
+
+    # Group animals by specie
+    animal_groups = [
+        list(result) for key, result in groupby(
+            enclosure.get_animals(), key=lambda animal: animal.specie
+            )
+    ]
+    report += f"""
+
+    You also have {len(animal_groups)} animals specie(s):
+    """
+    for group in animal_groups:
+        report += f"""
+        - {group[0].specie}:"""
+        for animal in list(group):
+            report += f"""
+            * A {animal.gender} named `{animal.name}` with """ + \
+                f"""{animal.life_points} LPs left"""
 
     return report
 
@@ -110,54 +125,85 @@ def let_animals_eat(enclosure: Enclosure) -> Enclosure:
     Enclosure
     """
     # Get a shuffled list of animals
-    animals_not_fed = enclosure.get_animals()
-    random.shuffle(animals_not_fed)
+    animals = enclosure.get_animals()
+    random.shuffle(animals)
+    dead_animals_indexes = []
+    already_fed_animals_indexes = []
 
-    dead_animals = []
-    already_fed_animals = []
     plants = enclosure.get_plants()
 
     # Loop until each animal eats
-    while len(animals_not_fed) != 0:
-        print(f"\nNumber of animals to be fed : {len(animals_not_fed)}")
+    while len(
+            already_fed_animals_indexes + dead_animals_indexes
+            ) != len(animals):
         current_animal_idx = None
         curr_animal_food_idx = None
-        indexes_to_delete = []
-        for idx, animal in enumerate(animals_not_fed):
+        for idx, animal in enumerate(animals):
             current_animal_idx = idx
+            skip = False
+
+            if idx in dead_animals_indexes + already_fed_animals_indexes:
+                skip = True
+                continue
 
             # A dead animal can do nothing
             if animal.state == LivingBeingStateEnum.DEAD.value:
-                break
+                skip = True
+                continue
 
-            print(f"{animal.name}, a {animal.specie} is looking for food.")
+            # If animal has more than 5 LP, then exit
+            if animal.life_points >= 5:
+                skip = True
+                already_fed_animals_indexes.append(current_animal_idx)
+                continue
+
+            print(
+                f"{animal.name}, a {animal.specie} "
+                f"has {animal.life_points} LPs and is looking for food."
+                )
 
             # If its a canivorous, look for another animal to eat
             if animal.diet == DietEnum.CARNIVOROUS.value:
                 curr_animal_food_idx = get_first_eatable_animal_index_in_list(
-                    animals=animals_not_fed,
+                    animals=animals,
                     exclude_idx=current_animal_idx
                 )
                 if curr_animal_food_idx is not None:
                     print(
-                        f"It eats a "
-                        f"{animals_not_fed[curr_animal_food_idx].specie} !"
+                        f"It eats some "
+                        f"{animals[curr_animal_food_idx].specie} "
+                        f"and got 5 LP !"
                     )
 
-                    # Found some animals to eat. Update their state to dead
-                    animals_not_fed[
-                        curr_animal_food_idx
-                        ].set_state(state=LivingBeingStateEnum.DEAD.value)
+                    # Found some animals to eat. Update LPs
+                    # The eater gots 5 LP
+                    animals[
+                            current_animal_idx
+                            ].set_life_points(life_points=animal.life_points+5)
 
-                    dead_animals.append(animals_not_fed[curr_animal_food_idx])
+                    # And the eaten looses 4LP
+                    food_lp = animals[
+                        curr_animal_food_idx
+                        ].life_points
+                    # Less than 4LP left, the poor dies
+                    if food_lp <= 4:
+                        animals[
+                            curr_animal_food_idx
+                            ].set_life_points(life_points=0)
+
+                        animals[
+                            curr_animal_food_idx
+                            ].set_state(state=LivingBeingStateEnum.DEAD.value)
+                        dead_animals_indexes.append(
+                            curr_animal_food_idx
+                        )
+                    else:
+                        animals[
+                            curr_animal_food_idx
+                            ].set_life_points(life_points=food_lp-4)
 
                     # Add the current animal to the already_fed_list
-                    already_fed_animals.append(
-                        animals_not_fed[current_animal_idx]
-                    )
-
-                    # Remove the eaten animal from the list
-                    indexes_to_delete.append(curr_animal_food_idx)
+                    already_fed_animals_indexes.append(current_animal_idx)
                     break
 
             # Herbivorous case, look for plants
@@ -168,45 +214,51 @@ def let_animals_eat(enclosure: Enclosure) -> Enclosure:
                 if curr_animal_food_idx is not None:
 
                     print(
-                        f"It eats a "
-                        f"{plants[curr_animal_food_idx].specie} !"
+                        f"It eats some "
+                        f"{plants[curr_animal_food_idx].specie} "
+                        f"and got 4 more LP !"
                     )
 
-                    # Found some plants to eat. Update the plant list also
-                    plants[
-                        curr_animal_food_idx
-                        ].set_state(state=LivingBeingStateEnum.DEAD.value)
+                    # Found some plant to eat. Update LPs
+                    # The eater gots 4 LP
+                    animals[
+                        current_animal_idx
+                        ].set_life_points(life_points=animal.life_points+4)
 
-                    # Add the current animal to the alreadu_fed_list
-                    already_fed_animals.append(
-                        animals_not_fed[current_animal_idx]
-                    )
+                    # And the plant looses 2LP
+                    plant_lp = plants[curr_animal_food_idx].life_points
+
+                    # Less than 2LP left, the plant dies
+                    if plant_lp <= 2:
+                        plants[
+                            curr_animal_food_idx
+                            ].set_life_points(life_points=0)
+
+                        plants[
+                            curr_animal_food_idx
+                            ].set_state(state=LivingBeingStateEnum.DEAD.value)
+                    else:
+                        plants[
+                            curr_animal_food_idx
+                            ].set_life_points(life_points=plant_lp-2)
+
+                    # Add the current animal to the already_fed_list
+                    already_fed_animals_indexes.append(current_animal_idx)
                     break
             break
-        # If no food found for the current animal, set it state to dead
-        if curr_animal_food_idx is None:
+
+        if curr_animal_food_idx is None and not skip:
+            # If no food found for the current animal, set it state to dead
             print("It founds nothing to eat and dies...")
-            animals_not_fed[
+            animals[
                 current_animal_idx
             ].set_state(state=LivingBeingStateEnum.DEAD.value)
-            dead_animals.append(animals_not_fed[current_animal_idx])
-
-        # This animal has been handled, add to indexes_to_delete list
-        indexes_to_delete.append(current_animal_idx)
-
-        # Remove only the indexes from the the non fed animals list
-        animals_not_fed = [
-            animals_not_fed[i] for i, _ in enumerate(animals_not_fed)
-            if i not in indexes_to_delete
-        ]
-
-    print(f"{len(animals_not_fed)} animal(s) left to be fed")
+            dead_animals_indexes.append(current_animal_idx)
 
     # update the enclosure
-    enclosure.set_animals(animals_not_fed + already_fed_animals)
+    enclosure.set_animals(animals)
     enclosure.set_plants(plants)
-    print(f"{len(already_fed_animals)} animal(s) ate.")
-    print(f"{len(dead_animals)} animal(s) died.\n\n")
+    print(f"{len(dead_animals_indexes)} animal(s) died.\n\n")
 
     # Remose those dead entities
     enclosure = remove_dead_living_entities_from_enclosure(enclosure)
@@ -243,7 +295,38 @@ def remove_dead_living_entities_from_enclosure(
     return enclosure
 
 
-def move_forward_in_time(enclosure: Enclosure) -> Enclosure:
+def make_living_beings_spend_some_time(enclosure: Enclosure) -> Enclosure:
+    """
+    Make all living beings in the enclosure spending some time. This affects
+    their LP
+
+    Parameters
+    ----------
+        enclosure: Enclosure
+
+    Returns
+    -------
+    Enclosure
+    """
+
+    # Get list of animals and plants
+    animals = enclosure.get_animals()
+    plants = enclosure.get_plants()
+
+    # Make each plant get 1 LP
+    for idx, _ in enumerate(plants):
+        plants[idx].set_life_points(_.life_points + 1)
+
+    # Make each anomal looses 1 LP
+    for idx, _ in enumerate(animals):
+        animals[idx].set_life_points(_.life_points - 1)
+
+    enclosure.set_animals(animals=animals)
+    enclosure.set_plants(plants=plants)
+    return enclosure
+
+
+def move_forward_to_next_day(enclosure: Enclosure) -> Enclosure:
     """
     Triggers all related actions needed for the biodiversity
     inside an enclosure.
@@ -256,8 +339,9 @@ def move_forward_in_time(enclosure: Enclosure) -> Enclosure:
         -------
         Enclosure
     """
-
+    # Animals and plants get affected by time moving
+    enclosure = make_living_beings_spend_some_time(enclosure=enclosure)
     # Let's feed them. Or more precisely : Jungle's law
-    enclosure = let_animals_eat(enclosure)
+    enclosure = let_animals_eat(enclosure=enclosure)
 
     return enclosure

@@ -77,7 +77,8 @@ class LivingBeing():
         None
         """
         # Validate life_points value
-        if life_points is None or not isinstance(life_points, int):
+        if life_points is None or not isinstance(life_points, int) \
+                or life_points < 0:
             raise ValueError("`life_points` should be a an integer value")
 
         self._life_points = life_points

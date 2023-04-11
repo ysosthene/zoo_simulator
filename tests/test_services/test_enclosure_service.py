@@ -7,7 +7,8 @@ from entities.living_being import Animal, Plant
 from services.enclosure_service import (
     get_first_living_plant_index_in_list,
     let_animals_eat,
-    move_forward_in_time,
+    make_living_beings_spend_some_time,
+    move_forward_to_next_day,
     remove_dead_living_entities_from_enclosure
 )
 from utils import (
@@ -16,37 +17,6 @@ from utils import (
     PlantspecieEnum,
     genderEnum
 )
-
-
-def test_move_forward_in_time():
-    # Initialisation
-    enclosure = Enclosure()
-
-    lion = Animal(
-        name="Simba",
-        specie=AnimalSpecieEnum.LION.value,
-        gender=genderEnum.MALE.value
-    )
-    giraffe = Animal(
-        name="Jimmy",
-        specie=AnimalSpecieEnum.GIRAFFE.value,
-        gender=genderEnum.MALE.value
-    )
-    seaweed_1 = Plant(specie=PlantspecieEnum.SEAWEED.value)
-    seaweed_2 = Plant(specie=PlantspecieEnum.SEAWEED.value)
-
-    enclosure.add_animal(animal=lion)
-    enclosure.add_animal(animal=giraffe)
-    enclosure.add_plant(plant=seaweed_1)
-    enclosure.add_plant(plant=seaweed_2)
-
-    assert len(enclosure.get_plants()) == 2
-    assert len(enclosure.get_animals()) == 2
-
-    enclosure = move_forward_in_time(enclosure=enclosure)
-
-    assert len(enclosure.get_plants()) <= 2
-    assert len(enclosure.get_animals()) == 1
 
 
 def test_get_first_living_plant_index_in_list():
@@ -111,23 +81,41 @@ def test_let_animals_eat():
         gender=genderEnum.MALE.value
     )
     seaweed_1 = Plant(specie=PlantspecieEnum.SEAWEED.value)
-    seaweed_2 = Plant(specie=PlantspecieEnum.SEAWEED.value)
 
-    lion.set_state(LivingBeingStateEnum.DEAD.value)
-    enclosure.add_animal(lion)
+    lion.set_life_points(1)
+    giraffe.set_life_points(life_points=4)
     enclosure.add_animal(giraffe)
     enclosure.add_plant(seaweed_1)
-    enclosure.add_plant(seaweed_2)
 
     enclosure = let_animals_eat(enclosure=enclosure)
 
     assert len(enclosure.get_animals()) == 1
     assert len(enclosure.get_plants()) == 1
+    assert enclosure.get_animals()[0].life_points == 8
+    assert enclosure.get_plants()[0].life_points == 8
 
-    lion.set_state(LivingBeingStateEnum.ALIVE.value)
-    enclosure.set_plants([seaweed_1, seaweed_2])
+    giraffe.set_life_points(life_points=4)
     enclosure.set_animals([lion, giraffe])
 
     enclosure = let_animals_eat(enclosure=enclosure)
-    assert len(enclosure.get_animals()) == 1
-    assert len(enclosure.get_plants()) <= 1  # Depends on who each who first
+    assert len(enclosure.get_animals()) <= 2
+    assert len(enclosure.get_plants()) == 1
+    assert enclosure.get_animals()[0].life_points in [4, 6]
+    assert enclosure.get_plants()[0].life_points in [6, 8]
+
+
+def test_make_living_beings_spend_some_time():
+    enclosure = Enclosure()
+    lion = Animal(
+        name="Simba",
+        specie=AnimalSpecieEnum.LION.value,
+        gender=genderEnum.MALE.value
+    )
+    seaweed = Plant(specie=PlantspecieEnum.SEAWEED.value)
+
+    lion.set_state(LivingBeingStateEnum.DEAD.value)
+    enclosure.add_animal(lion)
+    enclosure.add_plant(seaweed)
+    enclosure = make_living_beings_spend_some_time(enclosure)
+    assert enclosure.get_animals()[0].life_points == 9
+    assert enclosure.get_plants()[0].life_points == 11
