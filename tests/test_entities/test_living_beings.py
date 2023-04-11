@@ -10,6 +10,8 @@ def test_living_being_entity():
     entity = LivingBeing()
     assert entity.state == LivingBeingStateEnum.ALIVE.value
     assert entity.life_points == 10
+    assert entity.age <= 20
+    assert entity.age >= 0
 
     with pytest.raises(TypeError):
         entity.set_state()
@@ -24,6 +26,8 @@ def test_living_being_entity():
         entity.set_life_points(-1)
 
     entity.set_state(state=LivingBeingStateEnum.DEAD.value)
+    entity.set_age(age=11)
+    assert entity.age == 11
     assert entity.state == LivingBeingStateEnum.DEAD.value
 
 

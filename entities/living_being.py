@@ -4,6 +4,7 @@ in an enclosure (animals and plants) and their initialization.
 """
 
 
+import random
 from utils import (
     AnimalSpecieDietEnum,
     PlantspecieEnum,
@@ -35,6 +36,7 @@ class LivingBeing():
         # A new living being has to be alive..
         self._state = LivingBeingStateEnum.ALIVE.value
         self._life_points = 10
+        self._age = random.randint(0, 20)
 
     @property
     def state(self) -> str:
@@ -43,6 +45,10 @@ class LivingBeing():
     @property
     def life_points(self) -> str:
         return self._life_points
+
+    @property
+    def age(self) -> str:
+        return self._age
 
     def set_state(self, state: str) -> None:
         """
@@ -82,6 +88,26 @@ class LivingBeing():
             raise ValueError("`life_points` should be a an integer value")
 
         self._life_points = life_points
+
+    def set_age(self, age: str) -> None:
+        """
+        Sets the living being age value.
+
+        Parameters
+        ----------
+            age: str
+
+        Returns
+        -------
+        None
+        """
+        # Validate age value
+        if age is None or not isinstance(age, int) or age not in range(21):
+            raise ValueError(
+                "`age` should be an integer between 0 and 20."
+            )
+
+        self._age = age
 
 
 class Animal(LivingBeing):

@@ -17,9 +17,13 @@ def report_enclosure_state(enclosure: Enclosure) -> str:
         )
 
     # Group plants by specie
+    sorted_plants = sorted(
+        enclosure.get_plants(),
+        key=lambda plant: plant.specie
+    )
     plant_group = [
         list(result) for key, result in groupby(
-            enclosure.get_plants(), key=lambda plant: plant.specie
+            sorted_plants, key=lambda plant: plant.specie
             )
     ]
     report = f"""
@@ -29,15 +33,20 @@ def report_enclosure_state(enclosure: Enclosure) -> str:
 
     for group in plant_group:
         report += f"""
-        - {group[0].specie}: """
+        - {group[0].specie.capitalize()}: """
         for idx, plant in enumerate(list(group)):
             report += f"""
-            * #{idx+1}: {plant.life_points} LPs left"""
+            #{idx+1}: is {plant.age} days old and """ + \
+                f"""{plant.life_points} LPs left"""
 
     # Group animals by specie
+    sorted_animals = sorted(
+        enclosure.get_animals(),
+        key=lambda animal: animal.specie
+    )
     animal_groups = [
         list(result) for key, result in groupby(
-            enclosure.get_animals(), key=lambda animal: animal.specie
+            sorted_animals, key=lambda animal: animal.specie
             )
     ]
     report += f"""
@@ -46,10 +55,11 @@ def report_enclosure_state(enclosure: Enclosure) -> str:
     """
     for group in animal_groups:
         report += f"""
-        - {group[0].specie}:"""
+        - {group[0].specie.capitalize()}:"""
         for animal in list(group):
             report += f"""
-            * A {animal.gender} named `{animal.name}` with """ + \
+            * A {animal.age} days old {animal.gender} """ + \
+                f"""named `{animal.name}` with """ + \
                 f"""{animal.life_points} LPs left"""
 
     return report
@@ -258,7 +268,10 @@ def let_animals_eat(enclosure: Enclosure) -> Enclosure:
     # update the enclosure
     enclosure.set_animals(animals)
     enclosure.set_plants(plants)
-    print(f"{len(dead_animals_indexes)} animal(s) died.\n\n")
+    print(
+        f"{len(dead_animals_indexes)} animal(s) died " +
+        "(hunger or had being eaten).\n\n"
+    )
 
     # Remose those dead entities
     enclosure = remove_dead_living_entities_from_enclosure(enclosure)
@@ -314,16 +327,31 @@ def make_living_beings_spend_some_time(enclosure: Enclosure) -> Enclosure:
     plants = enclosure.get_plants()
 
     # Make each plant get 1 LP
-    for idx, _ in enumerate(plants):
-        plants[idx].set_life_points(_.life_points + 1)
+    for idx, plant in enumerate(plants):
+        plants[idx].set_life_points(plant.life_points + 1)
+        if plant.age == 20:
+            print(
+                f"A {plant.specie} just died of old age."
+            )
+            plants[idx].set_state(LivingBeingStateEnum.DEAD.value)
+        else:
+            plants[idx].set_age(plant.age + 1)
 
     # Make each anomal looses 1 LP
-    for idx, _ in enumerate(animals):
-        animals[idx].set_life_points(_.life_points - 1)
+    for idx, animal in enumerate(animals):
+        animals[idx].set_life_points(animal.life_points - 1)
+        if animal.age == 20:
+            print(
+                f"{animal.name}, a {animal.gender} {animal.specie} "
+                f"has died of old age."
+            )
+            animals[idx].set_state(LivingBeingStateEnum.DEAD.value)
+        else:
+            animals[idx].set_age(animal.age + 1)
 
     enclosure.set_animals(animals=animals)
     enclosure.set_plants(plants=plants)
-    return enclosure
+    return remove_dead_living_entities_from_enclosure(enclosure)
 
 
 def move_forward_to_next_day(enclosure: Enclosure) -> Enclosure:
