@@ -7,21 +7,22 @@ import os
 
 from entities.enclosure import Enclosure
 from entities.living_being import Animal, Plant
-from services.enclosure_service import (
-    move_forward_to_next_day,
-    report_enclosure_state
+from repositories.enclosure_repository import (
+    load_enclosure_data_from_file,
+    save_enclosure_data_to_file,
 )
+from services.enclosure_service import move_forward_to_next_day, report_enclosure_state
 from utils import (
-    AnimalSpecieDietEnum,
+    CONFIG_FILENAME,
     AnimalSpecieEnum,
     PlantspecieEnum,
     SpecieTypeEnum,
-    genderEnum
+    genderEnum,
 )
 
 
 def clear_console():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 def ask_to_continue() -> None:
@@ -36,9 +37,7 @@ def get_specie_choice_menu(type: str) -> str:
     elif type == SpecieTypeEnum.PLANT.value:
         specie_list = PlantspecieEnum.values_list()
     else:
-        raise ValueError(
-            f"`type` value should be among {SpecieTypeEnum.values_list()}"
-        )
+        raise ValueError(f"`type` value should be among {SpecieTypeEnum.values_list()}")
 
     for idx, specie in enumerate(specie_list):
         menu += f"""
@@ -63,10 +62,9 @@ def get_animal_gender_input() -> str:
     while True:
         _input = input(get_gender_menu())
         if _input in [
-            "{:01d}".format(x)
-            for x in range(1, len(genderEnum.values_list())+1)
+            "{:01d}".format(x) for x in range(1, len(genderEnum.values_list()) + 1)
         ]:
-            gender = genderEnum.values_list()[int(_input)-1]
+            gender = genderEnum.values_list()[int(_input) - 1]
             clear_console()
             break
 
@@ -81,9 +79,9 @@ def get_animal_speecie_input() -> str:
         _input = input(get_specie_choice_menu(SpecieTypeEnum.ANIMAL.value))
         if _input in [
             "{:01d}".format(x)
-            for x in range(1, len(AnimalSpecieEnum.values_list())+1)
+            for x in range(1, len(AnimalSpecieEnum.values_list()) + 1)
         ]:
-            specie = AnimalSpecieEnum.values_list()[int(_input)-1]
+            specie = AnimalSpecieEnum.values_list()[int(_input) - 1]
             clear_console()
             break
         else:
@@ -105,17 +103,35 @@ def get_animal_name_input(prompt="Enter your animal's name: ") -> str:
     return name
 
 
+def get_config_file_path_input(
+    prompt="Enter the path of your config file "
+    f"or type default to use `{CONFIG_FILENAME}`:  ",
+) -> str:
+    while True:
+        path_input = input(prompt)
+        if path_input:
+            clear_console()
+            if path_input == "default":
+                path_input = CONFIG_FILENAME
+            path = path_input
+            break
+        else:
+            clear_console()
+            print("The path should be a non empty string value. Try again\n")
+    return path
+
+
 def trigger_adding_an_animal(enclosure: Enclosure) -> Enclosure:
     """
-        Ask details about a new animal to be created into the  given enclosure.
+    Ask details about a new animal to be created into the  given enclosure.
 
-        Parameters
-        ----------
-            enclosure: Enclosure
+    Parameters
+    ----------
+        enclosure: Enclosure
 
-        Returns
-        -------
-        Enclosure
+    Returns
+    -------
+    Enclosure
     """
     if enclosure is None or not isinstance(enclosure, Enclosure):
         raise ValueError("enclosure value should be an instance of Enclosure")
@@ -132,9 +148,7 @@ def trigger_adding_an_animal(enclosure: Enclosure) -> Enclosure:
     )
     # Finally create the animal
     animal = Animal(
-        name=name.strip().capitalize(),
-        gender=gender.strip(),
-        specie=specie
+        name=name.strip().capitalize(), gender=gender.strip(), specie=specie
     )
 
     # Add to enclosure
@@ -147,23 +161,21 @@ def trigger_adding_an_animal(enclosure: Enclosure) -> Enclosure:
 
 def trigger_adding_a_seaweed(enclosure: Enclosure) -> Enclosure:
     """
-        Add a seaweed to the given enclosure.
+    Add a seaweed to the given enclosure.
 
-        Parameters
-        ----------
-            enclosure: Enclosure
+    Parameters
+    ----------
+        enclosure: Enclosure
 
-        Returns
-        -------
-        Enclosure
+    Returns
+    -------
+    Enclosure
     """
     if enclosure is None or not isinstance(enclosure, Enclosure):
         raise ValueError("enclosure value should be an instance of Enclosure")
 
     # Add to enclosure
-    enclosure.add_plant(
-        Plant(specie=PlantspecieEnum.SEAWEED.value)
-    )
+    enclosure.add_plant(Plant(specie=PlantspecieEnum.SEAWEED.value))
     clear_console()
     print("\nA new seaweed plant have been added to the enclosure\n")
     ask_to_continue()
@@ -200,7 +212,7 @@ def trigger_moving_forward_in_time(enclosure: Enclosure) -> Enclosure:
 
 
 def get_menu(enclosure: Enclosure) -> str:
-    """ Print a menu with details of the current enclosure. """
+    """Print a menu with details of the current enclosure."""
 
     return f"""
         {report_enclosure_state(enclosure=enclosure)}
@@ -210,13 +222,15 @@ def get_menu(enclosure: Enclosure) -> str:
         1 -> Add an Animal.
         2 -> Add a seaweed.
         3 -> Move forward in time.
-        4 -> Exit.
+        4 -> Persist current state.
+        5 -> Load state from file
+        6 -> Exit.
 
     Your selection: """
 
 
 def main(enclosure: Enclosure = None, first_launch=True) -> None:
-    """ Start the zoo simulator. """
+    """Start the zoo simulator."""
 
     welcome_msg = """
                     ==== ZOO SIMULATOR ====
@@ -230,20 +244,32 @@ def main(enclosure: Enclosure = None, first_launch=True) -> None:
     else:
         current_enclosure = enclosure
 
-    while (user_input := input(get_menu(current_enclosure))) != "4":
+    while (user_input := input(get_menu(current_enclosure))) != "6":
         if user_input == "1":
-            current_enclosure = trigger_adding_an_animal(
-                enclosure=current_enclosure
-            )
+            current_enclosure = trigger_adding_an_animal(enclosure=current_enclosure)
         elif user_input == "2":
-            current_enclosure = trigger_adding_a_seaweed(
-                enclosure=current_enclosure
-            )
+            current_enclosure = trigger_adding_a_seaweed(enclosure=current_enclosure)
         elif user_input == "3":
             current_enclosure = trigger_moving_forward_in_time(
                 enclosure=current_enclosure
             )
             ask_to_continue()
+        elif user_input == "4":
+            save_enclosure_data_to_file(enclosure=current_enclosure)
+            print("Written to file successfully")
+            ask_to_continue()
+        elif user_input == "5":
+            # Ask for path and try to load
+            path = get_config_file_path_input()
+            try:
+                current_enclosure = load_enclosure_data_from_file(
+                    enclosure=current_enclosure, path=path
+                )
+                print("Data loaded successfully")
+            except Exception as e:
+                print(e)
+            finally:
+                ask_to_continue()
         else:
             print("Invalid option, please try again!\n")
 

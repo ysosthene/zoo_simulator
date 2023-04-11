@@ -5,17 +5,18 @@ in an enclosure (animals and plants) and their initialization.
 
 
 import random
+from typing import Dict
 from utils import (
     AnimalSpecieDietEnum,
     PlantspecieEnum,
     genderEnum,
     AnimalSpecieEnum,
     LivingBeingStateEnum,
-    DietEnum
+    DietEnum,
 )
 
 
-class LivingBeing():
+class LivingBeing:
     """
     Common base entity class for animals and plant.
 
@@ -66,7 +67,8 @@ class LivingBeing():
         if state is None or state not in LivingBeingStateEnum.values_list():
             raise ValueError(
                 f"`state` should be a among the following values \
-                    {LivingBeingStateEnum.values_list()}.")
+                    {LivingBeingStateEnum.values_list()}."
+            )
 
         self._state = state
 
@@ -83,8 +85,7 @@ class LivingBeing():
         None
         """
         # Validate life_points value
-        if life_points is None or not isinstance(life_points, int) \
-                or life_points < 0:
+        if life_points is None or not isinstance(life_points, int) or life_points < 0:
             raise ValueError("`life_points` should be a an integer value")
 
         self._life_points = life_points
@@ -103,9 +104,7 @@ class LivingBeing():
         """
         # Validate age value
         if age is None or not isinstance(age, int) or age not in range(21):
-            raise ValueError(
-                "`age` should be an integer between 0 and 20."
-            )
+            raise ValueError("`age` should be an integer between 0 and 20.")
 
         self._age = age
 
@@ -142,15 +141,22 @@ class Animal(LivingBeing):
             raise ValueError("name should be a valid string.")
 
         # Validate specie value
-        if specie is None or not isinstance(specie, str) \
-                or specie not in AnimalSpecieEnum.values_list():
+        if (
+            specie is None
+            or not isinstance(specie, str)
+            or specie not in AnimalSpecieEnum.values_list()
+        ):
             raise ValueError(
                 f"`specie` should be a among the following values \
-                    {AnimalSpecieEnum.values_list()}.")
+                    {AnimalSpecieEnum.values_list()}."
+            )
 
         # Validate gender value received
-        if gender is None or not isinstance(gender, str) \
-                or gender not in genderEnum.values_list():
+        if (
+            gender is None
+            or not isinstance(gender, str)
+            or gender not in genderEnum.values_list()
+        ):
             raise ValueError("gender should be `male` or `female`")
 
         # Fetch the matching diet value using the key in AnimalSpecieEnum
@@ -169,50 +175,17 @@ class Animal(LivingBeing):
 
     @property
     def gender(self) -> str:
-        """ Return the gender attribute value. """
+        """Return the gender attribute value."""
         return self._gender
 
     @property
     def diet(self) -> str:
-        """ Return the diet attribute value. """
+        """Return the diet attribute value."""
         return self._diet
 
     @property
     def specie(self) -> str:
         return self._specie
-
-    def eat(self, food: LivingBeing) -> None:
-        """
-        Feed the animal instance.
-
-        Parameters
-        ----------
-            food: Animal | Plant
-
-        Returns
-        -------
-        None
-        """
-        if not food:
-            raise ValueError(
-                "`food` parameter value received is not correct."
-            )
-        if (
-            self.diet == DietEnum.CARNIVOROUS.value
-            and not isinstance(food, Animal)
-        ):
-            raise ValueError(
-                f"{self.specie} should be fed with an Animal object."
-            )
-        elif (
-            self.diet == DietEnum.HERBIVOROUS.value
-            and not isinstance(food, Plant)
-        ):
-            raise ValueError(
-                f"{self.specie} should be fed with a Plant object."
-            )
-
-        # Feeding the animal
 
 
 class Plant(LivingBeing):
@@ -236,11 +209,15 @@ class Plant(LivingBeing):
         super(Plant, self).__init__()
 
         # Validate specie value
-        if specie is None or not isinstance(specie, str) \
-                or specie not in PlantspecieEnum.values_list():
+        if (
+            specie is None
+            or not isinstance(specie, str)
+            or specie not in PlantspecieEnum.values_list()
+        ):
             raise ValueError(
                 f"`specie` should be a among the following values \
-                    {PlantspecieEnum.values_list()}.")
+                    {PlantspecieEnum.values_list()}."
+            )
 
         self._specie = specie
 
