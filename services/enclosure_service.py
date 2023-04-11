@@ -7,7 +7,7 @@ import random
 from typing import List
 from entities.enclosure import Enclosure
 from entities.living_being import Animal, Plant
-from utils import DietEnum, LivingBeingStateEnum
+from utils import DietEnum, LivingBeingStateEnum, genderEnum
 
 
 def report_enclosure_state(enclosure: Enclosure) -> str:
@@ -269,7 +269,7 @@ def let_animals_eat(enclosure: Enclosure) -> Enclosure:
     enclosure.set_animals(animals)
     enclosure.set_plants(plants)
     print(
-        f"{len(dead_animals_indexes)} animal(s) died " +
+        f"\n{len(dead_animals_indexes)} animal(s) died " +
         "(hunger or had being eaten).\n\n"
     )
 
@@ -351,7 +351,103 @@ def make_living_beings_spend_some_time(enclosure: Enclosure) -> Enclosure:
 
     enclosure.set_animals(animals=animals)
     enclosure.set_plants(plants=plants)
-    return remove_dead_living_entities_from_enclosure(enclosure)
+    return enclosure
+
+
+def make_living_beings_breed(enclosure: Enclosure) -> Enclosure:
+    """
+    Make capable living beings in the enclosure reproduce
+
+    Parameters
+    ----------
+        enclosure: Enclosure
+
+    Returns
+    -------
+    Enclosure
+    """
+    already_involved_animals_indexes = []
+    newborn_animals = []
+    new_plants = []
+
+    # Group animals by specie
+    sorted_animals = sorted(
+        enclosure.get_animals(),
+        key=lambda animal: animal.specie
+    )
+    animal_groups = [
+        list(result) for key, result in groupby(
+            sorted_animals, key=lambda animal: animal.specie
+            )
+    ]
+    for group in animal_groups:
+        # For each specie, group by gender
+        available_males = []
+        available_females = []
+        for idx, animal in enumerate(list(group)):
+            # Look for not starving animals
+            if animal.life_points >= 5 and \
+                    idx not in already_involved_animals_indexes:
+                if animal.gender == genderEnum.MALE.value:
+                    available_males.append(animal)
+                else:
+                    available_females.append(animal)
+        # Check possibles matches
+        possible_newborns = min([len(available_males), len(available_females)])
+        if possible_newborns != 0:
+            for _ in range(possible_newborns):
+                father = available_males.pop(0)
+                mother = available_females.pop(0)
+                already_involved_animals_indexes.append(father)
+                already_involved_animals_indexes.append(mother)
+
+                # Create the newborn animal
+                newborn_gender = random.choice(genderEnum.values_list())
+                newborn_name = " jr"
+                if newborn_gender == genderEnum.FEMALE.value:
+                    newborn_name = mother.name + newborn_name
+                else:
+                    newborn_name = father.name + newborn_name
+
+                new_born = Animal(
+                    name=newborn_name,
+                    gender=newborn_gender,
+                    specie=father.specie
+                )
+                new_born.set_age(age=0)
+                newborn_animals.append(new_born)
+                print(
+                    f"\n{father.name} and {mother.name}, "
+                    f"two {father.specie}s had a new baby :"
+                    f"\n -> Welcome to {newborn_name}. "
+                    f"It's a {new_born.gender}"
+                )
+
+    # Look for plants with 10+ LPs
+    plants = enclosure.get_plants()
+    for idx, plant in enumerate(plants):
+        if plant.life_points >= 10:
+            # Create a new plant with half of this one LPs
+            new_baby_plant = Plant(
+                specie=plant.specie
+            )
+            new_baby_plant.set_life_points(int(plant.life_points/2))
+            new_baby_plant.set_age(plant.age)
+            new_plants.append(new_baby_plant)
+
+            # Update the parent and reduce its LPs by half
+            plants[idx].set_life_points(int(plant.life_points/2))
+    print(
+        f"\n{len(new_plants)} plant(s) reproduce to new ones !"
+    )
+    # Set new content of the enclosure
+    enclosure.set_animals(
+        animals=enclosure.get_animals() + newborn_animals
+    )
+    enclosure.set_plants(
+        plants=plants + new_plants
+    )
+    return enclosure
 
 
 def move_forward_to_next_day(enclosure: Enclosure) -> Enclosure:
@@ -368,8 +464,18 @@ def move_forward_to_next_day(enclosure: Enclosure) -> Enclosure:
         Enclosure
     """
     # Animals and plants get affected by time moving
-    enclosure = make_living_beings_spend_some_time(enclosure=enclosure)
+    enclosure = remove_dead_living_entities_from_enclosure(
+        make_living_beings_spend_some_time(enclosure=enclosure)
+    )
+
+    # We may have some nice surprises, let's see if there is new babies
+    enclosure = remove_dead_living_entities_from_enclosure(
+        make_living_beings_breed(enclosure=enclosure)
+    )
+
     # Let's feed them. Or more precisely : Jungle's law
-    enclosure = let_animals_eat(enclosure=enclosure)
+    enclosure = remove_dead_living_entities_from_enclosure(
+        let_animals_eat(enclosure=enclosure)
+    )
 
     return enclosure
