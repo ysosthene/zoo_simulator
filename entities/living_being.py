@@ -89,13 +89,13 @@ class LivingBeing():
 
         self._life_points = life_points
 
-    def set_age(self, age: str) -> None:
+    def set_age(self, age: int) -> None:
         """
         Sets the living being age value.
 
         Parameters
         ----------
-            age: str
+            age: int
 
         Returns
         -------

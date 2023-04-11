@@ -7,6 +7,7 @@ from entities.living_being import Animal, Plant
 from services.enclosure_service import (
     get_first_living_plant_index_in_list,
     let_animals_eat,
+    make_living_beings_breed,
     make_living_beings_spend_some_time,
     remove_dead_living_entities_from_enclosure
 )
@@ -130,3 +131,71 @@ def test_make_living_beings_spend_some_time():
 
     # Check that tiger_lily died because of age
     assert enclosure.get_animals()[1].state == LivingBeingStateEnum.DEAD.value
+
+
+def test_make_living_beings_breed() -> None:
+    enclosure = Enclosure()
+    enclosure.add_animal(
+        Animal(
+            name="Simba",
+            specie=AnimalSpecieEnum.LION.value,
+            gender=genderEnum.MALE.value
+        )
+    )
+    enclosure.add_animal(
+        Animal(
+            name="Nala",
+            specie=AnimalSpecieEnum.LION.value,
+            gender=genderEnum.FEMALE.value
+        )
+    )
+    enclosure.add_animal(
+        Animal(
+            name="giraffe 1",
+            specie=AnimalSpecieEnum.GIRAFFE.value,
+            gender=genderEnum.MALE.value
+        )
+    )
+    enclosure.add_animal(
+        Animal(
+            name="giraffe 2",
+            specie=AnimalSpecieEnum.LION.value,
+            gender=genderEnum.MALE.value
+        )
+    )
+    enclosure.add_animal(
+        Animal(
+            name="giraffe 3",
+            specie=AnimalSpecieEnum.GIRAFFE.value,
+            gender=genderEnum.FEMALE.value
+        )
+    )
+    tiger_1 = Animal(
+            name="Flash",
+            specie=AnimalSpecieEnum.TIGER.value,
+            gender=genderEnum.FEMALE.value
+    )
+    tiger_2 = Animal(
+            name="Flash 2",
+            specie=AnimalSpecieEnum.TIGER.value,
+            gender=genderEnum.MALE.value
+    )
+    tiger_1.set_life_points(4)
+    tiger_2.set_life_points(1)
+    enclosure.add_animal(tiger_1)
+    enclosure.add_animal(tiger_2)
+    enclosure.add_plant(
+        Plant(
+            specie=PlantspecieEnum.SEAWEED.value,
+        )
+    )
+    plant_1 = Plant(
+        specie=PlantspecieEnum.SEAWEED.value,
+    )
+    plant_1.set_life_points(8)
+    enclosure.add_plant(plant_1)
+
+    enclosure = make_living_beings_breed(enclosure)
+
+    assert len(enclosure.get_animals()) == 9
+    assert len(enclosure.get_plants()) == 3
